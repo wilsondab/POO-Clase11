@@ -1,3 +1,6 @@
+using Ejercicio4Modulo3.Models;
+using Microsoft.EntityFrameworkCore;
+
 namespace Ejercicio4Modulo3
 {
     public class Program
@@ -13,6 +16,14 @@ namespace Ejercicio4Modulo3
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            var connection = builder.Configuration.GetConnectionString("DefaultConnection");
+
+            builder.Services.AddDbContext<Ejercicio4Modulo3Context>(opt =>
+                    opt.UseSqlServer(connection));
+            builder.Services.AddScoped<IProveedorService, ProveedorService>();
+            builder.Services.AddScoped<ILogService, LogService>();
+            builder.Services.AddScoped<GlobalExceptionHandler>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -26,8 +37,9 @@ namespace Ejercicio4Modulo3
 
             app.UseAuthorization();
 
-
             app.MapControllers();
+
+            app.UseMiddleware<GlobalExceptionHandler>();
 
             app.Run();
         }
